@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My account{% endblock %}
+
+{% block body %}
+    <h1>Account</h1>
+    <p>Hello {{ app.user.userIdentifier }}</p>
+
+    <form method="post" action="{{ path('app_account_delete') }}">
+        {# optional: ask for password confirmation #}
+        {# <input type="password" name="password" placeholder="Confirm password"> #}
+        <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Delete your account? This cannot be undone.')">
+            Delete my account
+        </button>
+    </form>
+{% endblock %}
