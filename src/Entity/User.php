@@ -6,9 +6,11 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,8 +20,11 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -48,6 +53,8 @@ class User
         return $this->id;
     }
 
+    // --- Name / Email / Password setters & getters ---
+
     public function getName(): ?string
     {
         return $this->name;
@@ -70,9 +77,44 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * A visual identifier that represents this user.
+     * Used by Symfony security (>=5.3) instead of getUsername().
+     */
+    public function getUserIdentifier(): string
     {
-        return $this->password;
+        return (string) $this->email;
+    }
+
+    // For backwards compatibility (some code may still call getUsername)
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    // --- Roles ---
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    // --- PasswordAuthenticatedUserInterface ---
+
+    public function getPassword(): string
+    {
+        // PasswordAuthenticatedUserInterface requires a non-null string
+        return (string) $this->password;
     }
 
     public function setPassword(string $password): static
@@ -80,6 +122,14 @@ class User
         $this->password = $password;
         return $this;
     }
+
+    // If you store temporary sensitive data, clear it here
+    public function eraseCredentials(): void
+    {
+        // $this->plainPassword = null;
+    }
+
+    // --- Collections ---
 
     // Created articles
     public function getCreatedArticles(): Collection
