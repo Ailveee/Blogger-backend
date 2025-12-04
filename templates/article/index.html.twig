@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% block title %}Articles{% endblock %}
+{% block body %}
+    <div class="container">
+        <h1>Articles</h1>
+        <a href="{{ path('app_article_new') }}"><button class="btn">Create New</button></a>
+
+        <table style="width:100%; border-collapse: collapse; margin-top:15px;">
+            <thead style="background:#2b2b2b; color:#fff;">
+            <tr>
+                <th style="padding:10px;">ID</th>
+                <th style="padding:10px;">Title</th>
+                <th style="padding:10px;">Category</th>
+                <th style="padding:10px;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for article in articles %}
+                <tr style="border-bottom:1px solid #444;">
+                    <td style="padding:10px;">{{ article.id }}</td>
+                    <td style="padding:10px;">{{ article.title }}</td>
+                    <td style="padding:10px;">{{ article.category ? article.category.name : '-' }}</td>
+                    <td style="padding:10px;">
+                        <a href="{{ path('app_article_show', {'id': article.id}) }}">Show</a> |
+                        <a href="{{ path('app_article_edit', {'id': article.id}) }}">Edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" style="padding:20px;">No articles found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

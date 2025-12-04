@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block title %}Article Details{% endblock %}
+{% block body %}
+    <div class="container">
+        <h1>{{ article.title }}</h1>
+        <p><strong>Category:</strong> {{ article.category ? article.category.name : 'None' }}</p>
+        <p><strong>Content:</strong><br>{{ article.content }}</p>
+        <a href="{{ path('app_article_edit', {'id': article.id}) }}"><button>Edit</button></a>
+        <a href="{{ path('app_article_index') }}">Back to list</a>
+    </div>
+{% endblock %}
