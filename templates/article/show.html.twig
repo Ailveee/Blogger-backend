@@ -1,42 +1,11 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Article{% endblock %}
-
+{% block title %}Article Details{% endblock %}
 {% block body %}
-    <h1>Article</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ article.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ article.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ article.content }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>ModifiedAt</th>
-                <td>{{ article.modifiedAt ? article.modifiedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>{{ article.status }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_article_index') }}">back to list</a>
-
-    <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
-
-    {{ include('article/_delete_form.html.twig') }}
+    <div class="container">
+        <h1>{{ article.title }}</h1>
+        <p><strong>Category:</strong> {{ article.category ? article.category.name : 'None' }}</p>
+        <p><strong>Content:</strong><br>{{ article.content }}</p>
+        <a href="{{ path('app_article_edit', {'id': article.id}) }}"><button>Edit</button></a>
+        <a href="{{ path('app_article_index') }}">Back to list</a>
+    </div>
 {% endblock %}

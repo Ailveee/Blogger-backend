@@ -18,7 +18,7 @@ class Article
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'text')]
     private ?string $content = null;
 
     #[ORM\Column]
@@ -30,18 +30,21 @@ class Article
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
-    // --- FIX: Proper creator (ManyToOne) ---
+    // single category for now
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    private ?Category $category = null;
+
     #[ORM\ManyToOne(inversedBy: 'createdArticles')]
     private ?User $createdBy = null;
 
     /** @var Collection<int, User> */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'likedArticles')]
-    #[ORM\JoinTable(name: "article_likes")] // FIX: unique join table name
+    #[ORM\JoinTable(name: "article_likes")]
     private Collection $likedBy;
 
     /** @var Collection<int, User> */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sharedArticles')]
-    #[ORM\JoinTable(name: "article_shares")] // FIX: unique join table name
+    #[ORM\JoinTable(name: "article_shares")]
     private Collection $sharedBy;
 
     /** @var Collection<int, Category> */
@@ -55,137 +58,47 @@ class Article
         $this->listOfCategories = new ArrayCollection();
     }
 
-    // --- getters/setters ---
+    // --- getters / setters ---
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getTitle(): ?string { return $this->title; }
+    public function setTitle(string $title): static { $this->title = $title; return $this; }
 
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
+    public function getContent(): ?string { return $this->content; }
+    public function setContent(string $content): static { $this->content = $content; return $this; }
 
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-        return $this;
-    }
+    public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
 
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
+    public function getModifiedAt(): ?\DateTimeImmutable { return $this->modifiedAt; }
+    public function setModifiedAt(\DateTimeImmutable $modifiedAt): static { $this->modifiedAt = $modifiedAt; return $this; }
 
-    public function setContent(string $content): static
-    {
-        $this->content = $content;
-        return $this;
-    }
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
+    public function getCategory(): ?Category { return $this->category; }
+    public function setCategory(?Category $category): static { $this->category = $category; return $this; }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
+    public function getCreatedBy(): ?User { return $this->createdBy; }
+    public function setCreatedBy(?User $user): static { $this->createdBy = $user; return $this; }
 
-    public function getModifiedAt(): ?\DateTimeImmutable
-    {
-        return $this->modifiedAt;
-    }
+    public function getLikedBy(): Collection { return $this->likedBy; }
+    public function addLikedBy(User $user): static { if (!$this->likedBy->contains($user)) { $this->likedBy->add($user); } return $this; }
+    public function removeLikedBy(User $user): static { $this->likedBy->removeElement($user); return $this; }
 
-    public function setModifiedAt(\DateTimeImmutable $modifiedAt): static
-    {
-        $this->modifiedAt = $modifiedAt;
-        return $this;
-    }
+    public function getSharedBy(): Collection { return $this->sharedBy; }
+    public function addSharedBy(User $user): static { if (!$this->sharedBy->contains($user)) { $this->sharedBy->add($user); } return $this; }
+    public function removeSharedBy(User $user): static { $this->sharedBy->removeElement($user); return $this; }
 
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    // --- Creator ---
-    public function getCreatedBy(): ?User
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(?User $createdBy): static
-    {
-        $this->createdBy = $createdBy;
-        return $this;
-    }
-
-    // --- LikedBy ---
-    public function getLikedBy(): Collection
-    {
-        return $this->likedBy;
-    }
-
-    public function addLikedBy(User $user): static
-    {
-        if (!$this->likedBy->contains($user)) {
-            $this->likedBy->add($user);
-        }
-        return $this;
-    }
-
-    public function removeLikedBy(User $user): static
-    {
-        $this->likedBy->removeElement($user);
-        return $this;
-    }
-
-    // --- SharedBy ---
-    public function getSharedBy(): Collection
-    {
-        return $this->sharedBy;
-    }
-
-    public function addSharedBy(User $user): static
-    {
-        if (!$this->sharedBy->contains($user)) {
-            $this->sharedBy->add($user);
-        }
-        return $this;
-    }
-
-    public function removeSharedBy(User $user): static
-    {
-        $this->sharedBy->removeElement($user);
-        return $this;
-    }
-
-    // --- Categories ---
-    public function getListOfCategories(): Collection
-    {
-        return $this->listOfCategories;
-    }
-
-    public function addListOfCategory(Category $category): static
-    {
+    public function getListOfCategories(): Collection { return $this->listOfCategories; }
+    public function addListOfCategory(Category $category): static {
         if (!$this->listOfCategories->contains($category)) {
             $this->listOfCategories->add($category);
             $category->addListOfArticle($this);
         }
         return $this;
     }
-
-    public function removeListOfCategory(Category $category): static
-    {
+    public function removeListOfCategory(Category $category): static {
         if ($this->listOfCategories->removeElement($category)) {
             $category->removeListOfArticle($this);
         }

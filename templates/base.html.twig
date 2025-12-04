@@ -1,17 +1,73 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Welcome!{% endblock %}</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    {% block stylesheets %}
+        <style>
+            /* Global reset */
+            *, *::before, *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: Arial, sans-serif;
+            }
+
+            body {
+                background: #121212; /* DARK clean background */
+                color: #e0e0e0; /* Soft white */
+                min-height: 100vh;
+                padding: 40px 20px;
+            }
+
+            a {
+                color: #4da3ff;
+            }
+
+            .container {
+                max-width: 500px;
+                margin: auto;
+                background: #1e1e1e;
+                padding: 30px 25px;
+                border-radius: 10px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            }
+
+            input, select, textarea {
+                width: 100%;
+                padding: 12px;
+                border: none;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                background: #2b2b2b;
+                color: #fff;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                background: #4da3ff;
+                border: none;
+                border-radius: 8px;
+                color: #000;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.2s ease-in-out;
+            }
+
+            button:hover {
+                background: #74b8ff;
+            }
+        </style>
+    {% endblock %}
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+
+<body>
+{% block body %}{% endblock %}
+</body>
 </html>
