@@ -3,11 +3,23 @@
 {% block title %}Edit Category{% endblock %}
 
 {% block body %}
-    <h1>Edit Category</h1>
+    <div class="container py-5">
 
-    {{ include('category/_form.html.twig', {'button_label': 'Update'}) }}
+        <a href="{{ path('app_category_index') }}" class="btn btn-outline-secondary mb-4">← Back</a>
 
-    <a href="{{ path('app_category_index') }}">back to list</a>
+        <div class="card shadow-sm">
+            <div class="card-body">
 
-    {{ include('category/_delete_form.html.twig') }}
+                <h3 class="mb-4">Edit Category</h3>
+
+                {{ include('category/_form.html.twig', {button_label: 'Update'}) }}
+
+                <div class="mt-3">
+                    {{ include('category/_delete_form.html.twig') }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 {% endblock %}
