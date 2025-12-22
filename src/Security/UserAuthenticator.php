@@ -52,7 +52,7 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         // default: redirect to site root — change to a named route if you prefer
-        return new RedirectResponse('/');
+        return new RedirectResponse('/home');
     }
 
     protected function getLoginUrl(Request $request): string

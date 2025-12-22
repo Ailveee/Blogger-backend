@@ -6,12 +6,10 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -20,27 +18,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $email = null;
+    #[ORM\Column(length: 180, unique: true)]
+    private string $email;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    #[ORM\Column]
+    private string $password;
 
-    /** @var Collection<int, Article> */
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'createdBy')]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Article::class)]
     private Collection $createdArticles;
 
-    /** @var Collection<int, Article> */
-    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'likedBy')]
+    #[ORM\ManyToMany(mappedBy: 'likedBy', targetEntity: Article::class)]
     private Collection $likedArticles;
 
-    /** @var Collection<int, Article> */
-    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'sharedBy')]
+    #[ORM\ManyToMany(mappedBy: 'sharedBy', targetEntity: Article::class)]
     private Collection $sharedArticles;
 
     public function __construct()
@@ -50,104 +45,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->sharedArticles = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getUserIdentifier(): string { return $this->email; }
+    public function getRoles(): array { return array_unique([...$this->roles, 'ROLE_USER']); }
+    public function getPassword(): string { return $this->password; }
 
-    // --- Name / Email / Password setters & getters ---
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function getEmail(): ?string
+    public function __toString(): string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
     {
         $this->email = $email;
-        return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     * Used by Symfony security (>=5.3) instead of getUsername().
-     */
-    public function getUserIdentifier(): string
+    public function setPassword(string $password): void
     {
-        return (string) $this->email;
+        $this->password = $password;
     }
 
-    // For backwards compatibility (some code may still call getUsername)
-    public function getUsername(): string
+    public function getName(): string
     {
-        return $this->getUserIdentifier();
+        return $this->name;
     }
 
-    // --- Roles ---
-
-    public function getRoles(): array
+    public function setName(string $name): void
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        $this->name = $name;
     }
 
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
         return $this;
     }
 
-    // --- PasswordAuthenticatedUserInterface ---
-
-    public function getPassword(): string
-    {
-        // PasswordAuthenticatedUserInterface requires a non-null string
-        return (string) $this->password;
-    }
-
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-    // If you store temporary sensitive data, clear it here
-    public function eraseCredentials(): void
-    {
-        // $this->plainPassword = null;
-    }
-
-    // --- Collections ---
-
-    // Created articles
-    public function getCreatedArticles(): Collection
-    {
-        return $this->createdArticles;
-    }
-
-    // Liked articles
-    public function getLikedArticles(): Collection
-    {
-        return $this->likedArticles;
-    }
-
-    // Shared articles
-    public function getSharedArticles(): Collection
-    {
-        return $this->sharedArticles;
-    }
+    public function eraseCredentials(): void {}
 }

@@ -1,11 +1,34 @@
 {% extends 'base.html.twig' %}
-{% block title %}Article Details{% endblock %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
 {% block body %}
-    <div class="container">
+    <div class="container mt-4">
         <h1>{{ article.title }}</h1>
-        <p><strong>Category:</strong> {{ article.category ? article.category.name : 'None' }}</p>
-        <p><strong>Content:</strong><br>{{ article.content }}</p>
-        <a href="{{ path('app_article_edit', {'id': article.id}) }}"><button>Edit</button></a>
-        <a href="{{ path('app_article_index') }}">Back to list</a>
+        <p>By {{ article.author.name }} | {{ article.createdAt|date('Y-m-d H:i') }}</p>
+
+        <p>
+            {% for category in article.categories %}
+                <span class="badge bg-secondary">{{ category.name }}</span>
+            {% else %}
+                No categories
+            {% endfor %}
+        </p>
+
+        <div class="mb-3">{{ article.content|nl2br }}</div>
+
+        <p>Likes: {{ article.likedBy|length }}</p>
+
+        <form action="{{ path('app_article_like', {id: article.id}) }}" method="post">
+            <button type="submit" class="btn btn-primary">
+                {% if app.user and article.likedBy.contains(app.user) %}
+                    Unlike
+                {% else %}
+                    Like
+                {% endif %}
+            </button>
+        </form>
+
+        <a href="{{ path('app_home') }}" class="btn btn-link mt-3">Back to Home</a>
     </div>
 {% endblock %}

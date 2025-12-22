@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Available Articles</h1>
+
+        {% if articles is empty %}
+            <p>No articles available.</p>
+        {% else %}
+            <div class="list-group">
+                {% for article in articles %}
+                    <a href="{{ path('app_article_show', {id: article.id}) }}" class="list-group-item list-group-item-action mb-2">
+                        <h5>{{ article.title }}</h5>
+                        <p>{{ article.content|slice(0, 150) ~ '...' }}</p>
+                        <small>
+                            By {{ article.author.name }} |
+                            {{ article.createdAt ? article.createdAt|date('Y-m-d H:i') : '-' }} |
+                            Categories:
+                            {% for category in article.categories %}
+                                <span class="badge bg-secondary">{{ category.name }}</span>
+                            {% else %}
+                                -
+                            {% endfor %}
+                        </small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

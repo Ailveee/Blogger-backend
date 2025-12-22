@@ -15,65 +15,40 @@ class Category
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    /** @var Collection<int, Article> */
-    #[ORM\ManyToMany(targetEntity: Article::class, inversedBy: 'listOfCategories')]
-    #[ORM\JoinTable(name: "article_category")]
-    private Collection $listOfArticles;
+    #[ORM\ManyToMany(mappedBy: 'categories', targetEntity: Article::class)]
+    private Collection $articles;
 
     public function __construct()
     {
-        $this->listOfArticles = new ArrayCollection();
+        $this->articles = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getName(): ?string { return $this->name; }
+    public function setName(string $name): self { $this->name = $name; return $this; }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+    public function getDescription(): ?string { return $this->description; }
+    public function setDescription(?string $description): self { $this->description = $description; return $this; }
 
-    public function setName(string $name): static
+    public function getArticles(): Collection { return $this->articles; }
+    public function addArticle(Article $article): self
     {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    public function getListOfArticles(): Collection
-    {
-        return $this->listOfArticles;
-    }
-
-    public function addListOfArticle(Article $article): static
-    {
-        if (!$this->listOfArticles->contains($article)) {
-            $this->listOfArticles->add($article);
+        if (!$this->articles->contains($article)) {
+            $this->articles->add($article);
         }
         return $this;
     }
-
-    public function removeListOfArticle(Article $article): static
+    public function removeArticle(Article $article): self
     {
-        $this->listOfArticles->removeElement($article);
+        $this->articles->removeElement($article);
         return $this;
     }
+
+    public function __toString(): string { return $this->name ?? ''; }
 }

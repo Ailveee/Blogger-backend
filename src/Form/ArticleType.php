@@ -4,30 +4,46 @@ namespace App\Form;
 
 use App\Entity\Article;
 use App\Entity\Category;
+use App\Enum\ArticleStatus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ArticleType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('title', TextType::class, ['label' => 'Title'])
             ->add('content', TextareaType::class, ['label' => 'Content'])
-            ->add('category', EntityType::class, [
+            ->add('categories', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'placeholder' => 'No category',
-                'required' => false,
+                'multiple' => true,
+                'expanded' => true,
+                'label' => 'Categories',
+                'required' => false
+            ])
+            ->add('status', ChoiceType::class, [
+                'label' => 'Status',
+                'choices' => [
+                    'Draft' => ArticleStatus::DRAFT,
+                    'Published' => ArticleStatus::PUBLISHED,
+                    'Archived' => ArticleStatus::ARCHIVED,
+                ],
+                'expanded' => false,
+                'multiple' => false,
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['data_class' => Article::class]);
+        $resolver->setDefaults([
+            'data_class' => Article::class,
+        ]);
     }
 }

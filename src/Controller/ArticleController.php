@@ -14,15 +14,25 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/article')]
 class ArticleController extends AbstractController
 {
-    #[Route('/', name: 'app_article_index', methods: ['GET'])]
+    #[Route('/', name: 'app_article_index')]
     public function index(ArticleRepository $repo): Response
     {
+        // Fetch all articles including author and categories
+        $articles = $repo->createQueryBuilder('a')
+            ->leftJoin('a.author', 'author')
+            ->addSelect('author')
+            ->leftJoin('a.categories', 'c')
+            ->addSelect('c')
+            ->orderBy('a.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
         return $this->render('article/index.html.twig', [
-            'articles' => $repo->findAll(),
+            'articles' => $articles,
         ]);
     }
 
-    #[Route('/new', name: 'app_article_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_article_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $article = new Article();
@@ -30,11 +40,17 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $article->setCreatedAt(new \DateTimeImmutable())
-                ->setModifiedAt(new \DateTimeImmutable())
-                ->setStatus('draft')
-                ->setCreatedBy($this->getUser());
+            $article->setAuthor($this->getUser());
+
+            // Persist article first to avoid ManyToMany issues
             $em->persist($article);
+            $em->flush();
+
+            // Handle ManyToMany categories
+            foreach ($article->getCategories() as $category) {
+                $category->addArticle($article);
+            }
+
             $em->flush();
 
             return $this->redirectToRoute('app_article_index');
@@ -45,22 +61,22 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_article_show')]
     public function show(Article $article): Response
     {
-        return $this->render('article/show.html.twig', ['article' => $article]);
+        return $this->render('article/show.html.twig', [
+            'article' => $article
+        ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_article_edit')]
     public function edit(Request $request, Article $article, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $article->setModifiedAt(new \DateTimeImmutable());
             $em->flush();
-
             return $this->redirectToRoute('app_article_index');
         }
 
@@ -78,5 +94,25 @@ class ArticleController extends AbstractController
         }
 
         return $this->redirectToRoute('app_article_index');
+    }
+
+    // ✅ Like/Unlike route
+    #[Route('/{id}/like', name: 'app_article_like', methods: ['POST'])]
+    public function like(Article $article, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($article->getLikedBy()->contains($user)) {
+            $article->removeLikedBy($user); // Unlike
+        } else {
+            $article->addLikedBy($user); // Like
+        }
+
+        $em->flush();
+
+        return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
     }
 }

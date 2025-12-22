@@ -1,7 +1,11 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}New Article{% endblock %}
+
 {% block body %}
-    <h1>Create Article</h1>
-    {% include 'article/_form.html.twig' with {button_label: 'Create'} %}
-    <a href="{{ path('app_article_index') }}">Back to list</a>
+    <div class="container mt-4">
+        <h1>Create a New Article</h1>
+
+        {% include 'article/_form.html.twig' with {'form': form} %}
+    </div>
 {% endblock %}
