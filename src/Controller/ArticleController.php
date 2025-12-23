@@ -115,4 +115,19 @@ class ArticleController extends AbstractController
 
         return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
     }
+
+    #[Route('/{id}/share', name: 'app_article_share', methods: ['POST'])]
+    public function share(Article $article, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $article->addSharedBy($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
+    }
+
 }

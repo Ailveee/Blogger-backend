@@ -102,4 +102,21 @@ class Article
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sharedArticles')]
+    #[ORM\JoinTable(name: 'article_shares')]
+    private Collection $sharedBy;
+
+    public function getSharedBy(): Collection
+    {
+        return $this->sharedBy;
+    }
+
+    public function addSharedBy(User $user): self
+    {
+        if (!$this->sharedBy->contains($user)) {
+            $this->sharedBy->add($user);
+        }
+        return $this;
+    }
 }

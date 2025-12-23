@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+    <h2>{{ user.name }}’s Profile</h2>
+
+    <hr>
+
+    <h4>📝 My Articles</h4>
+    <ul>
+        {% for article in user.createdArticles %}
+            <li>
+                <a href="{{ path('app_article_show', {id: article.id}) }}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% else %}
+            <li>No articles written.</li>
+        {% endfor %}
+    </ul>
+
+    <h4>❤️ Liked Articles</h4>
+    <ul>
+        {% for article in user.likedArticles %}
+            <li>
+                <a href="{{ path('app_article_show', {id: article.id}) }}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% else %}
+            <li>No liked articles.</li>
+        {% endfor %}
+    </ul>
+
+    <h4>🔁 Shared Articles</h4>
+    <ul>
+        {% for article in user.sharedArticles %}
+            <li>
+                <a href="{{ path('app_article_show', {id: article.id}) }}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% else %}
+            <li>No shared articles.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

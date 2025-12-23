@@ -2,23 +2,19 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    private string $name;
 
     #[ORM\Column(length: 180, unique: true)]
     private string $email;
@@ -29,13 +25,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password;
 
+    #[ORM\Column(length: 255)]
+    private string $name;
+
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Article::class)]
     private Collection $createdArticles;
 
-    #[ORM\ManyToMany(mappedBy: 'likedBy', targetEntity: Article::class)]
+    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'likedBy')]
     private Collection $likedArticles;
 
-    #[ORM\ManyToMany(mappedBy: 'sharedBy', targetEntity: Article::class)]
+    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'sharedBy')]
     private Collection $sharedArticles;
 
     public function __construct()
@@ -45,38 +44,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->sharedArticles = new ArrayCollection();
     }
 
-    public function getUserIdentifier(): string { return $this->email; }
-    public function getRoles(): array { return array_unique([...$this->roles, 'ROLE_USER']); }
-    public function getPassword(): string { return $this->password; }
+    /* =========================
+       REQUIRED BY SYMFONY
+       ========================= */
 
-    public function __toString(): string
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getUserIdentifier(): string
     {
         return $this->email;
     }
+
+    public function eraseCredentials(): void {}
+
+    /* =========================
+       EMAIL
+       ========================= */
 
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+        return $this;
     }
 
-    public function setPassword(string $password): void
-    {
-        $this->password = $password;
-    }
+    /* =========================
+       ROLES
+       ========================= */
 
-    public function getName(): string
+    public function getRoles(): array
     {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
+        return array_unique(array_merge($this->roles, ['ROLE_USER']));
     }
 
     public function setRoles(array $roles): self
@@ -85,5 +90,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function eraseCredentials(): void {}
+    /* =========================
+       PASSWORD
+       ========================= */
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /* =========================
+       NAME  ✅ THIS FIXES YOUR ERROR
+       ========================= */
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self   // ← THIS WAS MISSING
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /* =========================
+       RELATIONS
+       ========================= */
+
+    public function getCreatedArticles(): Collection
+    {
+        return $this->createdArticles;
+    }
+
+    public function getLikedArticles(): Collection
+    {
+        return $this->likedArticles;
+    }
+
+    public function getSharedArticles(): Collection
+    {
+        return $this->sharedArticles;
+    }
 }

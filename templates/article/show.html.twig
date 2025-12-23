@@ -3,32 +3,31 @@
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>{{ article.title }}</h1>
-        <p>By {{ article.author.name }} | {{ article.createdAt|date('Y-m-d H:i') }}</p>
+    <h1>{{ article.title }}</h1>
 
-        <p>
-            {% for category in article.categories %}
-                <span class="badge bg-secondary">{{ category.name }}</span>
-            {% else %}
-                No categories
-            {% endfor %}
-        </p>
+    <p>
+        By {{ article.author.name }} · {{ article.createdAt|date('Y-m-d H:i') }}
+    </p>
 
-        <div class="mb-3">{{ article.content|nl2br }}</div>
+    <p>
+        {% for category in article.categories %}
+            <span class="badge bg-secondary">{{ category.name }}</span>
+        {% endfor %}
+    </p>
 
-        <p>Likes: {{ article.likedBy|length }}</p>
+    <div class="mb-4">{{ article.content|nl2br }}</div>
 
-        <form action="{{ path('app_article_like', {id: article.id}) }}" method="post">
-            <button type="submit" class="btn btn-primary">
-                {% if app.user and article.likedBy.contains(app.user) %}
-                    Unlike
-                {% else %}
-                    Like
-                {% endif %}
+    <p>❤️ {{ article.likedBy|length }} likes</p>
+
+    {% if app.user %}
+        <form method="post" action="{{ path('app_article_like', {id: article.id}) }}">
+            <button class="btn btn-outline-primary">
+                {% if article.likedBy.contains(app.user) %}Unlike{% else %}Like{% endif %}
             </button>
         </form>
 
-        <a href="{{ path('app_home') }}" class="btn btn-link mt-3">Back to Home</a>
-    </div>
+        <form method="post" action="{{ path('app_article_share', {id: article.id}) }}" class="mt-2">
+            <button class="btn btn-outline-success">Share</button>
+        </form>
+    {% endif %}
 {% endblock %}
