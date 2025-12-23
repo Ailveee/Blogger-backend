@@ -1,0 +1,53 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+    <h1 class="mb-4">Dashboard</h1>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-primary text-center p-3">
+                <h6>Total Users</h6>
+                <h2>{{ totalUsers }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success text-center p-3">
+                <h6>Total Articles</h6>
+                <h2>{{ totalArticles }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-warning text-center p-3">
+                <h6>Total Categories</h6>
+                <h2>{{ totalCategories }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Recent Articles</h4>
+    <div class="row g-3">
+        {% for article in recentArticles %}
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text text-truncate">{{ article.content|slice(0, 100) ~ '...' }}</p>
+                        <small class="text-muted">By {{ article.author.name }} | {{ article.createdAt|date('Y-m-d') }}</small>
+                        <div class="mt-auto pt-2">
+                            <a href="{{ path('app_article_show', {id: article.id}) }}" class="btn btn-sm btn-outline-info me-1">View</a>
+                            <a href="{{ path('app_article_edit', {id: article.id}) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form action="{{ path('app_article_delete', {id: article.id}) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this article?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">No recent articles.</div>
+        {% endfor %}
+    </div>
+{% endblock %}

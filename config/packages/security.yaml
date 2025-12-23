@@ -60,7 +60,8 @@
 
 security:
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        # Use "auto" for User entity
+        App\Entity\User: 'auto'
 
     providers:
         app_user_provider:
@@ -69,17 +70,34 @@ security:
                 property: email
 
     firewalls:
+        # Disable security for dev tools
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
         main:
             lazy: true
             provider: app_user_provider
             form_login:
-                username_parameter: email
-                password_parameter: password
                 login_path: app_login
                 check_path: app_login
+                username_parameter: email
+                password_parameter: password
                 default_target_path: app_home
             logout:
                 path: app_logout
+                target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week
+                path: /
 
     access_control:
+        # Articles creation only for logged-in users
         - { path: ^/article/new, roles: ROLE_USER }
+        - { path: ^/article/\d+/edit, roles: ROLE_USER }
+        - { path: ^/article/\d+/delete, roles: ROLE_USER }
+        # Admin section
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # Everything else is accessible for authenticated users or guests as needed
+
