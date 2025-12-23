@@ -27,11 +27,9 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        // read from the submitted form
         $email = (string) $request->request->get('email', '');
         $password = (string) $request->request->get('password', '');
 
-        // store last username in session (for the login form)
         $request->getSession()->set('last_username', $email);
 
         return new Passport(
@@ -46,12 +44,10 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // redirect to the originally requested page if any
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        // default: redirect to site root — change to a named route if you prefer
         return new RedirectResponse('/home');
     }
 
