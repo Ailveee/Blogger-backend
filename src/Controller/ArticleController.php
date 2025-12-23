@@ -42,11 +42,9 @@ class ArticleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $article->setAuthor($this->getUser());
 
-            // Persist article first to avoid ManyToMany issues
             $em->persist($article);
             $em->flush();
 
-            // Handle ManyToMany categories
             foreach ($article->getCategories() as $category) {
                 $category->addArticle($article);
             }
@@ -72,6 +70,11 @@ class ArticleController extends AbstractController
     #[Route('/{id}/edit', name: 'app_article_edit')]
     public function edit(Request $request, Article $article, EntityManagerInterface $em): Response
     {
+        if ($this->getUser() !== $article->getAuthor()) {
+            $this->addFlash('danger', 'You cannot edit this article.');
+            return $this->redirectToRoute('app_article_index');
+        }
+
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
@@ -85,9 +88,14 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $em): Response
     {
+        if ($this->getUser() !== $article->getAuthor()) {
+            $this->addFlash('danger', 'You cannot delete this article.');
+            return $this->redirectToRoute('app_article_index');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
             $em->remove($article);
             $em->flush();
@@ -96,38 +104,33 @@ class ArticleController extends AbstractController
         return $this->redirectToRoute('app_article_index');
     }
 
-    // ✅ Like/Unlike route
+    // Like/Unlike
     #[Route('/{id}/like', name: 'app_article_like', methods: ['POST'])]
     public function like(Article $article, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+        if (!$user) return $this->redirectToRoute('app_login');
 
         if ($article->getLikedBy()->contains($user)) {
-            $article->removeLikedBy($user); // Unlike
+            $article->removeLikedBy($user);
         } else {
-            $article->addLikedBy($user); // Like
+            $article->addLikedBy($user);
         }
 
         $em->flush();
-
         return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
     }
 
+    // Share
     #[Route('/{id}/share', name: 'app_article_share', methods: ['POST'])]
     public function share(Article $article, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+        if (!$user) return $this->redirectToRoute('app_login');
 
         $article->addSharedBy($user);
         $em->flush();
 
         return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
     }
-
 }

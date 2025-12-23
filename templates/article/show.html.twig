@@ -3,31 +3,54 @@
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block body %}
-    <h1>{{ article.title }}</h1>
+    <div class="container my-5">
 
-    <p>
-        By {{ article.author.name }} · {{ article.createdAt|date('Y-m-d H:i') }}
-    </p>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title">{{ article.title }}</h1>
 
-    <p>
-        {% for category in article.categories %}
-            <span class="badge bg-secondary">{{ category.name }}</span>
-        {% endfor %}
-    </p>
+                <div class="mb-3 text-muted">
+                    By <a href="{{ path('app_profile', {id: article.author.id}) }}">
+                        {{ article.author.name }}
+                    </a>
+                    | Categories:
+                    {% for category in article.categories %}
+                        <span class="badge bg-secondary">{{ category.name }}</span>
+                    {% else %}
+                        -
+                    {% endfor %}
+                    | {{ article.createdAt ? article.createdAt|date('Y-m-d H:i') : '-' }}
+                </div>
 
-    <div class="mb-4">{{ article.content|nl2br }}</div>
+                <p class="card-text">{{ article.content }}</p>
 
-    <p>❤️ {{ article.likedBy|length }} likes</p>
+                <div class="d-flex gap-2 mt-4">
+                    <form action="{{ path('app_article_like', {id: article.id}) }}" method="post">
+                        <button type="submit" class="btn btn-outline-danger">
+                            {% if app.user and article.likedBy.contains(app.user) %}
+                                ❤️ Unlike
+                            {% else %}
+                                🤍 Like
+                            {% endif %}
+                            ({{ article.likedBy|length }})
+                        </button>
+                    </form>
 
-    {% if app.user %}
-        <form method="post" action="{{ path('app_article_like', {id: article.id}) }}">
-            <button class="btn btn-outline-primary">
-                {% if article.likedBy.contains(app.user) %}Unlike{% else %}Like{% endif %}
-            </button>
-        </form>
+                    <form action="{{ path('app_article_share', {id: article.id}) }}" method="post">
+                        <button type="submit" class="btn btn-outline-primary">
+                            🔁 Share ({{ article.sharedBy|length }})
+                        </button>
+                    </form>
 
-        <form method="post" action="{{ path('app_article_share', {id: article.id}) }}" class="mt-2">
-            <button class="btn btn-outline-success">Share</button>
-        </form>
-    {% endif %}
+                    {% if app.user and app.user == article.author %}
+                        <a href="{{ path('app_article_edit', {id: article.id}) }}" class="btn btn-warning">Edit</a>
+                        <form action="{{ path('app_article_delete', {id: article.id}) }}" method="post" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

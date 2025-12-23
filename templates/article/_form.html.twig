@@ -1,23 +1,7 @@
 {{ form_start(form) }}
-
-<div class="mb-3">
-    {{ form_label(form.title) }}
-    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
-    {{ form_errors(form.title) }}
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.content) }}
-    {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 5}}) }}
-    {{ form_errors(form.content) }}
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.categories) }}
-    {{ form_widget(form.categories) }}
-    {{ form_errors(form.categories) }}
-</div>
-
-<button type="submit" class="btn btn-primary">Save</button>
-
+<div class="mb-3">{{ form_label(form.title) }} {{ form_widget(form.title, {'attr': {'class':'form-control'}}) }} {{ form_errors(form.title) }}</div>
+<div class="mb-3">{{ form_label(form.content) }} {{ form_widget(form.content, {'attr': {'class':'form-control','rows':5}}) }} {{ form_errors(form.content) }}</div>
+<div class="mb-3">{{ form_label(form.categories) }} {{ form_widget(form.categories, {'attr': {'class':'form-check'}}) }} {{ form_errors(form.categories) }}</div>
+<div class="mb-3">{{ form_label(form.status) }} {{ form_widget(form.status, {'attr': {'class':'form-select'}}) }} {{ form_errors(form.status) }}</div>
+<button class="btn btn-primary">Save</button>
 {{ form_end(form) }}

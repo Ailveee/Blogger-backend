@@ -12,16 +12,24 @@ class HomeController extends AbstractController
     #[Route('/home', name: 'app_home')]
     public function index(ArticleRepository $articleRepository): Response
     {
-        // fetch all published articles (optional: only published)
-        $articles = $articleRepository->findBy(['status' => 'published'], ['createdAt' => 'DESC']);
+        // fetch all published articles with author and categories
+        $articles = $articleRepository->createQueryBuilder('a')
+            ->leftJoin('a.author', 'author')
+            ->addSelect('author')
+            ->leftJoin('a.categories', 'c')
+            ->addSelect('c')
+            ->where('a.status = :status')
+            ->setParameter('status', 'published')
+            ->orderBy('a.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
 
-        if ($this->getUser()) {
-            return $this->render('home/index.html.twig', [
-                'articles' => $articles, // pass articles to the template
-            ]);
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
         }
 
-        // Otherwise, redirect to login
-        return $this->redirectToRoute('app_login');
+        return $this->render('home/index.html.twig', [
+            'articles' => $articles,
+        ]);
     }
 }
