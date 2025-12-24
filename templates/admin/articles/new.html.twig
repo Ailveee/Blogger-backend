@@ -3,29 +3,42 @@
 {% block title %}{{ article is defined ? 'Edit' : 'New' }} Article{% endblock %}
 
 {% block body %}
-    <div class="container py-5">
-        <h2>{{ article is defined ? 'Edit Article' : 'Create New Article' }}</h2>
 
-        {{ form_start(form) }}
-        <div class="mb-3">
-            {{ form_label(form.title) }}
-            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.title) }}
+    <div class="container mt-4">
+        <h1>Create a New Article</h1>
+
+        <a href="{{ path('admin_article_index') }}" class="btn btn-outline-secondary mb-4">← Back</a>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% include 'admin/articles/_form.html.twig' with {'form': form} %}
+            </div>
         </div>
-
-        <div class="mb-3">
-            {{ form_label(form.content) }}
-            {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 5}}) }}
-            {{ form_errors(form.content) }}
-        </div>
-
-        <div class="mb-3">
-            {{ form_label(form.categories) }}
-            {{ form_widget(form.categories, {'attr': {'class': 'form-select'}}) }}
-            {{ form_errors(form.categories) }}
-        </div>
-
-        <button class="btn btn-primary">{{ article is defined ? 'Update' : 'Save' }}</button>
-        {{ form_end(form) }}
     </div>
+
+{#    <div class="container py-5">#}
+{#        <h2>{{ article is defined ? 'Edit Article' : 'Create New Article' }}</h2>#}
+
+{#        {{ form_start(form) }}#}
+{#        <div class="mb-3">#}
+{#            {{ form_label(form.title) }}#}
+{#            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}#}
+{#            {{ form_errors(form.title) }}#}
+{#        </div>#}
+
+{#        <div class="mb-3">#}
+{#            {{ form_label(form.content) }}#}
+{#            {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 5}}) }}#}
+{#            {{ form_errors(form.content) }}#}
+{#        </div>#}
+
+{#        <div class="mb-3">#}
+{#            {{ form_label(form.categories) }}#}
+{#            {{ form_widget(form.categories, {'attr': {'class': 'form-select'}}) }}#}
+{#            {{ form_errors(form.categories) }}#}
+{#        </div>#}
+
+{#        <button class="btn btn-primary">{{ article is defined ? 'Update' : 'Save' }}</button>#}
+{#        {{ form_end(form) }}#}
+{#    </div>#}
 {% endblock %}

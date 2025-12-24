@@ -6,6 +6,12 @@
     <div class="container mt-4">
         <h1>Create a New Article</h1>
 
-        {% include 'article/_form.html.twig' with {'form': form} %}
+        <a href="{{ path('app_article_index') }}" class="btn btn-outline-secondary mb-4">← Back</a>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% include 'article/_form.html.twig' with {'form': form} %}
+            </div>
+        </div>
     </div>
 {% endblock %}

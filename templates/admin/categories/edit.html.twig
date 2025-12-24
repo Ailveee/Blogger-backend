@@ -4,6 +4,7 @@
 {% block body %}
     <div class="container py-5">
         <h1>Edit Category</h1>
+        <a href="{{ path('admin_category_index') }}" class="btn btn-outline-secondary mb-4">← Back</a>
         <div class="card shadow-sm p-4">
             {{ form_start(form) }}
             <div class="mb-3">{{ form_label(form.name) }}{{ form_widget(form.name, {'attr': {'class':'form-control'}}) }}{{ form_errors(form.name) }}</div>

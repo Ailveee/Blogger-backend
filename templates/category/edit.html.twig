@@ -14,9 +14,11 @@
 
                 {{ include('category/_form.html.twig', {button_label: 'Update'}) }}
 
+                {% if is_granted('ROLE_ADMIN') %}
                 <div class="mt-3">
                     {{ include('category/_delete_form.html.twig') }}
                 </div>
+                {% endif %}
 
             </div>
         </div>
