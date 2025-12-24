@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/users')]
@@ -24,8 +25,28 @@ class UserController extends AbstractController
         return $this->render('admin/users/index.html.twig', ['users' => $users]);
     }
 
+    #[Route('/new', name: 'admin_user_new')]
+    public function new(Request $request,UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
+    {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $plain = $form->get('password')->getData();
+            $user->setPassword($passwordHasher->hashPassword($user, $plain));
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'User created successfully.');
+            return $this->redirectToRoute('admin_user_index');
+        }
+
+        return $this->render('admin/users/new.html.twig', ['form' => $form->createView()]);
+    }
+
     #[Route('/edit/{id}', name: 'admin_user_edit')]
-    public function edit(User $user, Request $request, EntityManagerInterface $em): Response
+    public function edit(User $user, Request $request,UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -33,6 +54,8 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $plain = $form->get('password')->getData();
+            $user->setPassword($passwordHasher->hashPassword($user, $plain));
             $em->flush();
             $this->addFlash('success', 'User updated successfully.');
             return $this->redirectToRoute('admin_user_index');

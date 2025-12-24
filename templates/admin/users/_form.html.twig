@@ -1,0 +1,9 @@
+{{ form_start(form) }}
+{#<div class="mb-3">{{ form_label(form.name) }} {{ form_widget(form.name, {'attr': {'class':'form-control'}}) }} {{ form_errors(form.name) }}</div>#}
+{#<div class="mb-3">{{ form_label(form.description) }} {{ form_widget(form.description, {'attr': {'class':'form-control','rows':3}}) }} {{ form_errors(form.description) }}</div>#}
+<div class="mb-3">{{ form_label(form.name) }}{{ form_widget(form.name, {'attr': {'class':'form-control'}}) }}{{ form_errors(form.name) }}</div>
+<div class="mb-3">{{ form_label(form.email) }}{{ form_widget(form.email, {'attr': {'class':'form-control'}}) }}{{ form_errors(form.email) }}</div>
+<div class="mb-3">{{ form_label(form.password) }}{{ form_widget(form.password, {'attr': {'class':'form-control'}}) }}{{ form_errors(form.password) }}</div>
+<div class="mb-3">{{ form_label(form.roles) }} {{ form_widget(form.roles, {'attr': {'class':'form-check'}}) }} {{ form_errors(form.roles) }}</div>
+<button class="btn btn-primary">Save</button>
+{{ form_end(form) }}

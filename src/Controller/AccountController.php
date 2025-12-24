@@ -1,6 +1,8 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -20,6 +22,7 @@ class AccountController extends AbstractController
             'user' => $this->getUser(),
         ]);
     }
+
 
     #[Route('/account/delete', name: 'app_account_delete', methods: ['POST'])]
     public function delete(
