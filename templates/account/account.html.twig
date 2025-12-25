@@ -3,15 +3,48 @@
 {% block title %}My account{% endblock %}
 
 {% block body %}
-    <h1>Account</h1>
-    <p>Hello {{ app.user.userIdentifier }}</p>
+    <div class="container py-5">
+        <h1>My Account</h1>
 
-    <form method="post" action="{{ path('app_account_delete') }}">
-        {# optional: ask for password confirmation #}
-        {# <input type="password" name="password" placeholder="Confirm password"> #}
-        <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
-        <button class="btn btn-danger" type="submit" onclick="return confirm('Delete your account? This cannot be undone.')">
-            Delete my account
-        </button>
-    </form>
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card shadow-sm p-4 mb-4">
+            <h5 class="mb-3">Update information</h5>
+
+            {{ form_start(form) }}
+
+            <div class="mb-3">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.plainPassword) }}
+                {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                <small class="text-muted">Leave empty to keep current password</small>
+                {{ form_errors(form.plainPassword) }}
+            </div>
+
+            <button class="btn btn-primary">Save changes</button>
+
+            {{ form_end(form) }}
+        </div>
+
+        <div class="card border-danger p-4">
+            <h5 class="text-danger">Danger zone</h5>
+
+            <form method="post" action="{{ path('app_account_delete') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+                <button class="btn btn-danger"
+                        onclick="return confirm('Delete your account? This cannot be undone.')">
+                    Delete my account
+                </button>
+            </form>
+        </div>
+    </div>
 {% endblock %}
